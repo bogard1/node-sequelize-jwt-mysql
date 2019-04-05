@@ -1,14 +1,13 @@
 'use strict';
 
-var JWTStrategy = require('passport-jwt').Strategy,
-    ExtractJwt = require('passport-jwt').ExtractJwt;
+var JWTStrategy = require('passport-jwt').Strategy;
+var ExtractJwt = require('passport-jwt').ExtractJwt;
 
-var User = require('./../models/user'),
-    config = require('./../config');
+var User = require('./../models/user');
+var config = require('./../config');
 
 // Hooks the JWT Strategy.
-function hookJWTStrategy(passport)
-{
+function hookJWTStrategy(passport) {
     var options = {};
 
     options.secretOrKey = config.keys.secret;
@@ -17,7 +16,7 @@ function hookJWTStrategy(passport)
 
     passport.use(new JWTStrategy(options, function(JWTPayload, callback)
     {
-console.log(JWTPayload,  'hi ')
+        console.log(JWTPayload,  'hi ')
         User.findOne({ where: { id: JWTPayload.id } })
             .then(function(user)
             {
@@ -36,6 +35,5 @@ console.log(JWTPayload,  'hi ')
         ;
     }));
 }
-
 
 module.exports = hookJWTStrategy;
