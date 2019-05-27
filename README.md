@@ -1,5 +1,5 @@
 
- An authentication system built using **J**WTs, **A**ngular, **M**ySQL, **E**xpress and **S**equelize in the [Creating a Role-Based User Authentication System Using Angular, Express and MySQL]
+ A simple TODO list using **J**WTs, **A**ngular, **M**ySQL, **E**xpress and **S**equelize in the [Creating a Role-Based User Authentication System Using Angular, Express and MySQL]
 
 ### Installation
  In order to install the dependencies run:
@@ -12,7 +12,9 @@ In order to start the server run:
 ```
 node server.js
 ```
+
 ### Links
+
 - Derived from (https://github.com/dilagurung/node-sequelize-jwt-mysql)
 - http://docs.sequelizejs.com/manual/tutorial/models-definition.html
 - https://stackoverflow.com/questions/29716346/how-to-create-a-trigger-in-sequelize-nodejs

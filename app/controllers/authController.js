@@ -1,82 +1,60 @@
 'use strict';
 
 var jwt = require('jsonwebtoken');
-var    bCrypt = require('bcrypt');
-
-
-var config = require('../config'),
-    db = require('../services/database'),
-    User = require('../models/user');
+var bCrypt = require('bcrypt');
+var config = require('../config');
+var db = require('../services/database');
+var User = require('../models/user');
 
 // The authentication controller.
-var AuthController = {};
+var AuthController = {
+    signUp: function(req, res) {
+        console.log(req.body.user);
+        if(!req.body.user.id || !req.body.user.password) {
+            res.json({ message: 'Please provide user id  and a password.' });
+            res.json({ message: 'Please provide user id  and a password.' });
 
-// Register a user.
-AuthController.signUp = function(req, res)
-{
-    console.log(req.body.user);
-    if(!req.body.user.id || !req.body.user.password) {
-        res.json({ message: 'Please provide user id  and a password.' });
-        res.json({ message: 'Please provide user id  and a password.' });
-    } else {
-        db.sync().then(function() 
-        {
-            req.body.user.role=config.userRoles.user;
+            return
+        }
+
+        db.sync().then(function() {
+            req.body.user.role = config.userRoles.user;
             var newUser = req.body.user;
-            return User.create(newUser).then(function()
-            {
-               console.log('Account created');
+            return User.create(newUser).then(function() {
+                console.log('Account created');
                 res.status(201).json({ message: 'Account created!' });
             });
         }).catch(function(error) {
             console.log(error);
             res.status(403).json({ message: 'Username already exists!' });
         });
-    }
-}
+    },
 
-// Authenticate a user.
-AuthController.authenticateUser = function(req, res) {
-    //console.log(req.body.user);
-    if(!req.body.user.id || !req.body.user.password) {
-        console.log('needd');
-        res.status(404).json({ message: 'Username and password are needed!' });
-    } else {
+    authenticateUser: function(req, res) {
+        if(!req.body.user.id || !req.body.user.password) {
+            res.status(404).json(
+                { message: 'Username and password are needed!' }
+            );
+
+            return
+        }
         console.log(req.body.user.id);
-        console.log(req.body.user.password);
-        var id = req.body.user.id,
-            password = req.body.user.password;
-        //    potentialUser = { where: { username: username } };
+        // console.log(req.body.user.password);
 
-        console.log('',id);
-        User.findOne({where:{id: id}}).then(function(user)
-        {
-            if(!user)
-            {
-                console.log('auth failed');
-                res.status(404).json({ message: 'Authentication failed!' });
-            } else
-            {
-                /*bCrypt.hash('dila', 10, function(err, hash) {
-                    if (err) { throw (err); }
-                    console.log(user.password);
-                    bCrypt.compare('dila', "$2a$10$SHSX0ckTEYa8Swd4sjM7KeBuYPIXDXQttUfNRGAvSvlDAyAHATiOm", function(err, result) {
-                        if (err) { throw (err); }
-                        console.log(result,'hi dila');
-                    });});
-*/
-                comparePasswords(password,user.password,function(error, isMatch)
-                {
-                    console.log('error ',error);
-                    console.log('error d',isMatch);
-                    if(isMatch && !error)
+        var id = req.body.user.id;
+        var password = req.body.user.password;
 
+        User.findOne({ where: { id: id } })
+            .then(function(user) {
+                if(!user) {
+                    console.log('auth failed');
+                    res.status(404).json({ message: 'Authentication failed!' });
+                    return
+                }
 
-                    {
-
-
-
-console.log('password match');
+                comparePasswords(password, user.password, function(error, isMatch) {
+                    if(isMatch && !error) {
+                        console.log('password match');
 
                         var token = jwt.sign(
                             { id: user.id },
@@ -93,29 +71,18 @@ console.log('password match');
                         res.status(404).json({ message: 'Login failed!' });
                     }
                 });
-            }
-        }).catch(function(error)
-        {
-            console.log(error);
-            res.status(500).json({ message: 'There was an error!' });
-        });
+            }).catch(function(error) {
+                console.log(error);
+                res.status(500).json({ message: 'There was an error!' });
+            });
+        }
     }
-
-
-
-
-
-
-
-}
+};
 
 // Compares two passwords.
-function comparePasswords(password, hash, callback)
-{
-    console.log('hello iam herer');
+function comparePasswords(password, hash, callback) {
     bCrypt.compare(password, hash, function(error, isMatch) {
-        if(error)
-        {
+        if(error) {
             return callback(error);
         }
 

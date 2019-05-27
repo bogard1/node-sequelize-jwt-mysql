@@ -11,23 +11,20 @@ var Company=require('../../app/models/company');
 db = require('../services/database');
 var insert_company= function (req,res,next)
 {
+    db.sync().then(function () {
 
+        Company.findOrCreate({where: {id: req.body.company.id}, defaults: req.body.company})
+            .spread((company, created) => {
+                console.log(created, company);
+                res.json(created);
+            });
 
-db.sync().then(function () {
-
-    Company.findOrCreate({where: {id: req.body.company.id}, defaults: req.body.company})
-        .spread((company, created) => {
-            console.log(created, company);
-            res.json(created);
-        });
-
-}).catch(function (error) {
-    console.log(error);
-    res.sendStatus(403)
-})
-
-
+    }).catch(function (error) {
+        console.log(error);
+        res.sendStatus(403)
+    });
 }
+
 var update_company= function (req,res,next)
 {
     var _id=req.params.id;
@@ -96,5 +93,3 @@ var find_by_id=function (req,res,next)
 }
 
 module.exports={add:insert_company,delete:delete_company,update:update_company,find_all:find_all,find_by_id:find_by_id};
-
-
